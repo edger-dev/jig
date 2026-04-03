@@ -1,12 +1,12 @@
 { lib }:
 
 let
-  gatherNames = import ./gatherNames.nix;
-  gatherFiles = import ./gatherFiles.nix;
-  gatherExecutables = import ./gatherExecutables.nix;
-  gatherScriptPackages = import ./gatherScriptPackages.nix;
-  gatherContents = import ./gatherContents.nix;
-  concatContents = import ./concatContents.nix;
+  gatherNames_ = import ./gatherNames.nix;
+  gatherFiles_ = import ./gatherFiles.nix;
+  gatherExecutables_ = import ./gatherExecutables.nix;
+  gatherScriptPackages_ = import ./gatherScriptPackages.nix;
+  gatherContents_ = import ./gatherContents.nix;
+  concatContents_ = import ./concatContents.nix;
 in
 {
   # Core
@@ -14,41 +14,41 @@ in
   doPrefixName = import ./doPrefixName.nix;
   gatherImports = import ./gatherImports.nix;
 
-  # Generic (pass your own suffix)
-  inherit gatherNames gatherFiles gatherContents gatherExecutables gatherScriptPackages concatContents;
+  # Raw (pass lib and your own suffix)
+  inherit gatherNames_ gatherFiles_ gatherContents_ gatherExecutables_ gatherScriptPackages_ concatContents_;
 
-  # Pre-applied with nixpkgs lib
-  gatherNames_ = gatherNames lib;
-  gatherFiles_ = gatherFiles lib;
-  gatherContents_ = gatherContents lib;
-  gatherExecutables_ = gatherExecutables lib;
-  gatherScriptPackages_ = gatherScriptPackages lib;
+  # Pre-applied with nixpkgs lib (pass your own suffix)
+  gatherNames = gatherNames_ lib;
+  gatherFiles = gatherFiles_ lib;
+  gatherContents = gatherContents_ lib;
+  gatherExecutables = gatherExecutables_ lib;
+  gatherScriptPackages = gatherScriptPackages_ lib;
 
   # Fish
-  gatherFiles_fish = gatherFiles lib ".fish";
-  gatherExecutables_fish = gatherExecutables lib ".fish";
-  gatherScriptPackages_fish = gatherScriptPackages lib ".fish";
-  gatherContents_fish = gatherContents lib ".fish";
-  concatContents_fish = concatContents lib ".fish" "#" "\n\n\n";
+  gatherFiles_fish = gatherFiles_ lib ".fish";
+  gatherExecutables_fish = gatherExecutables_ lib ".fish";
+  gatherScriptPackages_fish = gatherScriptPackages_ lib ".fish";
+  gatherContents_fish = gatherContents_ lib ".fish";
+  concatContents_fish = concatContents_ lib ".fish" "#" "\n\n\n";
 
   # Bash
-  gatherFiles_bash = gatherFiles lib ".bash";
-  gatherExecutables_bash = gatherExecutables lib ".bash";
-  gatherScriptPackages_bash = gatherScriptPackages lib ".bash";
-  gatherContents_bash = gatherContents lib ".bash";
-  concatContents_bash = concatContents lib ".bash" "#" "\n\n\n";
+  gatherFiles_bash = gatherFiles_ lib ".bash";
+  gatherExecutables_bash = gatherExecutables_ lib ".bash";
+  gatherScriptPackages_bash = gatherScriptPackages_ lib ".bash";
+  gatherContents_bash = gatherContents_ lib ".bash";
+  concatContents_bash = concatContents_ lib ".bash" "#" "\n\n\n";
 
   # Nu
-  gatherFiles_nu = gatherFiles lib ".nu";
-  gatherExecutables_nu = gatherExecutables lib ".nu";
-  gatherContents_nu = gatherContents lib ".nu";
-  concatContents_nu = concatContents lib ".nu" "#" "\n\n\n";
+  gatherFiles_nu = gatherFiles_ lib ".nu";
+  gatherExecutables_nu = gatherExecutables_ lib ".nu";
+  gatherContents_nu = gatherContents_ lib ".nu";
+  concatContents_nu = concatContents_ lib ".nu" "#" "\n\n\n";
 
   # KDL
-  gatherFiles_kdl = gatherFiles lib ".kdl";
-  gatherContents_kdl = gatherContents lib ".kdl";
-  concatContents_kdl = concatContents lib ".kdl" "//" "\n\n\n";
+  gatherFiles_kdl = gatherFiles_ lib ".kdl";
+  gatherContents_kdl = gatherContents_ lib ".kdl";
+  concatContents_kdl = concatContents_ lib ".kdl" "//" "\n\n\n";
 
   # WASM
-  gatherFiles_wasm = gatherFiles lib ".wasm";
+  gatherFiles_wasm = gatherFiles_ lib ".wasm";
 }
