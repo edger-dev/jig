@@ -1,0 +1,19 @@
+# Beans configuration
+project:
+    name: {{project_name}}
+beans:
+    path: .beans
+    prefix: {{project_prefix}}-
+    id_length: 4
+    default_status: todo
+    default_type: task
+worktree:
+    base_ref: main
+    setup: ""
+    run: ""
+    integrate: local
+agent:
+    enabled: false
+    default_mode: act
+server:
+    port: 8881
