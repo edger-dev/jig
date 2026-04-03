@@ -16,12 +16,12 @@
     lib = nixpkgs.lib;
 
     # Autowire helpers (raw imports)
-    gatherNames = import ./lib/gatherNames.nix;
-    gatherFiles = import ./lib/gatherFiles.nix;
-    gatherExecutables = import ./lib/gatherExecutables.nix;
-    gatherScriptPackages = import ./lib/gatherScriptPackages.nix;
-    gatherContents = import ./lib/gatherContents.nix;
-    concatContents = import ./lib/concatContents.nix;
+    gatherNames = import ./lib/autowire/gatherNames.nix;
+    gatherFiles = import ./lib/autowire/gatherFiles.nix;
+    gatherExecutables = import ./lib/autowire/gatherExecutables.nix;
+    gatherScriptPackages = import ./lib/autowire/gatherScriptPackages.nix;
+    gatherContents = import ./lib/autowire/gatherContents.nix;
+    concatContents = import ./lib/autowire/concatContents.nix;
   in
   {
     lib = {
@@ -31,9 +31,9 @@
       };
 
       # Autowire: core
-      autowireDefault = import ./lib/default.nix;
-      doPrefixName = import ./lib/doPrefixName.nix;
-      gatherImports = import ./lib/gatherImports.nix;
+      autowireDefault = import ./lib/autowire/default.nix;
+      doPrefixName = import ./lib/autowire/doPrefixName.nix;
+      gatherImports = import ./lib/autowire/gatherImports.nix;
 
       # Autowire: generic (pass your own lib + suffix)
       inherit gatherNames gatherFiles gatherContents gatherExecutables gatherScriptPackages concatContents;
