@@ -69,7 +69,10 @@ Scaffold a jig into the current project. Steps:
 - Creates `docs/` directory with `book.toml`, `src/SUMMARY.md`, `src/introduction.md`
 - Merges docs mise tasks (`_docs-serve`, `docs-build`)
 - Appends docs CLAUDE.md section
-- If beans jig is active AND docs jig requested with beans, remind the user to set `docs = { beans = true; }` in their flake's jigs
+- **Beans integration**: If beans jig is active (`.beans.yml` exists), ask whether to enable beans in docs:
+  - If yes: append `book.beans.toml` contents to `book.toml`, copy `src/beans-sidebar.css` into `docs/src/`
+  - If no: use base `book.toml` only, skip `beans-sidebar.css`
+  - Remind the user to set `docs = { beans = true; }` in their flake's jigs when beans is enabled
 
 ### `/jig sync [jig-name]`
 
@@ -109,6 +112,7 @@ Show which jigs are active in the current project and their status.
 - On init: create if missing, skip if exists (warn the user)
 - On sync: show the diff between current file and template, ask before applying
 - For `.gitignore`: append missing entries rather than overwriting
+- For `book.toml`: base template is `book.toml`; if beans is active, also concatenate `book.beans.toml` and ensure `src/beans-sidebar.css` exists
 
 ## Nix Flake Guidance
 
