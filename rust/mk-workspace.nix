@@ -70,7 +70,7 @@ flake-utils.lib.eachDefaultSystem (system:
         + " -- --deny warnings";
     });
 
-    fmt = craneLib.cargoFmt { src = cleanSrc; };
+    fmt = craneLib.cargoFmt { inherit pname; src = cleanSrc; };
 
     checks = {
       build = package;
