@@ -83,11 +83,11 @@ flake-utils.lib.eachDefaultSystem (system:
     jigSkillsHook = ''
       if [ -d .claude ]; then
         mkdir -p .claude/skills
-        for skill in ${jigSrc}/skills/*.md; do
-          name="$(basename "$skill")"
+        for skill_dir in ${jigSrc}/skills/*/; do
+          name="$(basename "$skill_dir")"
           target=".claude/skills/$name"
           if [ ! -e "$target" ]; then
-            ln -s "$skill" "$target"
+            ln -s "$skill_dir" "$target"
           fi
         done
       fi
