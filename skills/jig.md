@@ -27,6 +27,7 @@ Scaffold a jig into the current project. Steps:
    - If the target file doesn't exist: create it, replacing `{{placeholders}}` with project values
    - If the target file exists: merge intelligently (see Merging Rules below)
 3. Report what was created/updated
+4. Remind the user to run `nix develop` (or `direnv reload`) — the devShell automatically symlinks jig skills into `.claude/skills/`
 
 **Placeholders** (ask the user if not obvious from context):
 - `{{project_name}}` — human-readable project name

@@ -25,7 +25,7 @@
 #   rust             — Rust workspace (crane + fenix + bacon)
 #   docs             — Documentation (mdbook + optional mdbook-beans)
 
-{ nixpkgs, flake-utils, crane, fenix, mdbook-beans }:
+{ nixpkgs, flake-utils, crane, fenix, mdbook-beans, jigSrc }:
 
 config: jigs:
 
@@ -79,13 +79,34 @@ flake-utils.lib.eachDefaultSystem (system:
       ++ (extraDevPackages pkgs)
     ;
 
+    # Symlink jig skills into .claude/skills/ on shell entry
+    jigSkillsHook = ''
+      if [ -d .claude ]; then
+        mkdir -p .claude/skills
+        for skill in ${jigSrc}/skills/*.md; do
+          name="$(basename "$skill")"
+          target=".claude/skills/$name"
+          if [ ! -e "$target" ]; then
+            ln -s "$skill" "$target"
+          fi
+        done
+      fi
+    '';
+
     # Use crane devShell if rust jig is active (inherits check environment),
     # otherwise use a plain mkShell
     devShell =
       if rustResult != null then
-        rustResult.mkDevShell { inherit checks; packages = devPackages; }
+        rustResult.mkDevShell {
+          inherit checks;
+          packages = devPackages;
+          shellHook = jigSkillsHook;
+        }
       else
-        pkgs.mkShell { buildInputs = devPackages; };
+        pkgs.mkShell {
+          buildInputs = devPackages;
+          shellHook = jigSkillsHook;
+        };
   in
   {
     inherit packages checks;

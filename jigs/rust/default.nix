@@ -71,7 +71,7 @@ in
   ];
 
   # Expose crane's devShell builder so mkWorkspace can use it
-  mkDevShell = { checks, packages }: craneLib.devShell {
-    inherit checks packages;
+  mkDevShell = { checks, packages, shellHook ? "" }: craneLib.devShell {
+    inherit checks packages shellHook;
   };
 }

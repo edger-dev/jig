@@ -22,9 +22,13 @@
     lib = {
       mkWorkspace = import ./mk-workspace.nix {
         inherit nixpkgs flake-utils crane fenix mdbook-beans;
+        jigSrc = self;
       };
 
       autowire = import ./lib/autowire { lib = nixpkgs.lib; };
     };
+
+    # Nix store path to jig skills — works for both local and git flake inputs
+    skillsPath = self + "/skills";
   };
 }
