@@ -9,24 +9,33 @@ Each jig is an independent, composable module:
 | Jig | What it provides |
 |-----|-----------------|
 | **beans** | Issue tracking config, Claude Code hooks, workflow practices (planning, commits, code review) |
-| **rust** | Nix flake module (`mkRustWorkspace`), bacon diagnostics, mise tasks, TDD workflow |
+| **rust** | Crane + fenix build, clippy/fmt checks, bacon diagnostics, mise tasks, TDD workflow |
+| **docs** | mdbook setup, optional mdbook-beans integration, mise tasks |
 
 ## Usage
 
-### Nix Flake (Rust)
+### Nix Flake
 
 ```nix
 {
   inputs.jig.url = "github:edger-dev/jig";
 
   outputs = { self, jig }:
-    jig.lib.mkRustWorkspace {
-      pname = "my-project";
-      src = ./.;
-      # buildPackages = [ "my-cli" ];
-      # wasm = true;
-      # extraDevPackages = pkgs: [ pkgs.dioxus-cli ];
-    };
+    jig.lib.mkWorkspace
+      {
+        pname = "my-project";
+        src = ./.;
+        # extraDevPackages = pkgs: [ ];
+      }
+      {
+        rust = {
+          # buildPackages = [ "my-cli" ];
+          # wasm = true;
+        };
+        docs = {
+          # beans = true;
+        };
+      };
 }
 ```
 
@@ -39,6 +48,7 @@ Copy `skills/jig.md` into your project's `.claude/skills/` (or your global `~/.c
 ```
 /jig init beans       # scaffold beans issue tracking
 /jig init rust        # scaffold rust workspace config
+/jig init docs        # scaffold mdbook documentation
 /jig sync             # update jig-managed files from latest templates
 /jig list             # show active jigs
 ```
@@ -46,19 +56,17 @@ Copy `skills/jig.md` into your project's `.claude/skills/` (or your global `~/.c
 ## Structure
 
 ```
-flake.nix                       # exports lib.mkRustWorkspace
-rust/mk-workspace.nix           # rust dev environment builder
+flake.nix                       # exports lib.mkWorkspace, lib.autowire
+mk-workspace.nix                # composable workspace builder
+jigs/
+  rust/default.nix              # rust jig (crane + fenix + bacon)
+  docs/default.nix              # docs jig (mdbook + mdbook-beans)
+lib/
+  autowire/                     # nix module/file autowiring helpers
 templates/
   beans/                        # beans jig templates
-    .beans.yml
-    .beans/.gitignore
-    CLAUDE.md                   # planning + workflow sections
-    claude-settings-hooks.json  # hooks to merge into .claude/settings.json
   rust/                         # rust jig templates
-    bacon.toml
-    CLAUDE.md                   # rust workflow + TDD sections
-    .gitignore
-    mise-tasks.toml
+  docs/                         # docs jig templates
 skills/
   jig.md                        # Claude Code skill definition
 ```

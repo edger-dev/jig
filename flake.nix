@@ -9,12 +9,19 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mdbook-beans = {
+      url = "github:edger-dev/mdbook-beans/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.crane.follows = "crane";
+      inputs.fenix.follows = "fenix";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, crane, fenix }: {
+  outputs = { self, nixpkgs, flake-utils, crane, fenix, mdbook-beans }: {
     lib = {
-      mkRustWorkspace = import ./rust/mk-workspace.nix {
-        inherit nixpkgs flake-utils crane fenix;
+      mkWorkspace = import ./mk-workspace.nix {
+        inherit nixpkgs flake-utils crane fenix mdbook-beans;
       };
 
       autowire = import ./lib/autowire { lib = nixpkgs.lib; };

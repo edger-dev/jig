@@ -54,6 +54,36 @@
         "type": "github"
       }
     },
+    "mdbook-beans": {
+      "inputs": {
+        "crane": [
+          "crane"
+        ],
+        "fenix": [
+          "fenix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774924792,
+        "narHash": "sha256-pUdWCC2waY/DeDEs3DYDyNnSDnQF6puE0OAswVAmLmw=",
+        "owner": "edger-dev",
+        "repo": "mdbook-beans",
+        "rev": "86b19955dcd417f590ec6b050655b6452dc7fcb9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edger-dev",
+        "ref": "main",
+        "repo": "mdbook-beans",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1775126147,
@@ -75,6 +105,7 @@
         "crane": "crane",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
+        "mdbook-beans": "mdbook-beans",
         "nixpkgs": "nixpkgs"
       }
     },
