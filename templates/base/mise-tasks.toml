@@ -1,0 +1,9 @@
+# Shared base tasks (from jig)
+
+[tasks.jig-update]
+run = "nix flake update jig"
+description = "Update jig to latest from github"
+
+[tasks.jig-update-local]
+run = "nix flake update --override-input jig path:$HOME/edger/jig"
+description = "Override jig with local checkout (for development)"
