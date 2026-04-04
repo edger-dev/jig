@@ -30,7 +30,7 @@ resolve them as part of every change.
 
 If `.bacon-claude-diagnostics` is absent or clearly stale (e.g. the file doesn't
 exist after the first save), warn the user that bacon does not appear to
-be running and ask them to start it in a Zellij pane with `mise run bacon-claude-diagnostics`.
+be running and ask them to start it in a Zellij pane with `mise run _bacon-claude-diagnostics`.
 
 ## Test-Driven Development
 
