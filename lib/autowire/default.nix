@@ -11,8 +11,10 @@ in
 {
   # Core
   wireImports = import ./wireImports.nix;
+  wireImportsRecursively = import ./wireImportsRecursively.nix;
   doPrefixName = import ./doPrefixName.nix;
   gatherImports = import ./gatherImports.nix;
+  gatherImportsRecursively = import ./gatherImportsRecursively.nix;
 
   # Raw (pass lib and your own suffix)
   inherit gatherNames_ gatherFiles_ gatherContents_ gatherExecutables_ gatherScriptPackages_ concatContents_;
