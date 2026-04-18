@@ -42,7 +42,7 @@ Scaffold a jig into the current project. Steps:
 
 `/jig init rust`:
 - Check if beans jig is already present (look for `.beans.yml`). If not, suggest running `/jig init beans` first.
-- Creates `bacon.toml`, `.gitignore`, merges mise tasks
+- Creates `Cargo.toml` (workspace skeleton: edition 2024, empty `members`, standard lints), `bacon.toml`, `.gitignore`, merges mise tasks
 - Appends rust CLAUDE.md section (bacon workflow, TDD)
 - The nix flake is NOT templated — instead, show the user a sample `flake.nix` using the new `mkWorkspace` API:
 
