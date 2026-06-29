@@ -57,11 +57,11 @@
     "kinora-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1782447953,
-        "narHash": "sha256-9jeeqfz2BnsHaI4GgUo9rfITcu8O4NHSRR3aVqn/ZIg=",
+        "lastModified": 1782720879,
+        "narHash": "sha256-yKyOJCApWY/oy3zUgxwXn5FslwuhPnGcp/RESYRcDtM=",
         "owner": "edger-dev",
         "repo": "kinora",
-        "rev": "5e668e6b979b7dc336c9196ec833a95826da92e7",
+        "rev": "5a376e0f645421d71d66d96321c30335b4dde5b2",
         "type": "github"
       },
       "original": {
