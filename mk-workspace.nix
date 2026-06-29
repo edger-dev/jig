@@ -23,22 +23,28 @@
 #
 # Second arg (jigs):
 #   rust             — Rust workspace (crane + fenix + bacon)
-#   docs             — Documentation (mdbook + optional mdbook-beans)
+#   docs             — Documentation (mdbook)
+#   kinora           — kinora knowledge ledger (provides the `kinora` CLI)
 
-{ nixpkgs, flake-utils, crane, fenix, mdbook-beans, jigSrc }:
+{ nixpkgs, flake-utils, crane, fenix, kinora-src, jigSrc }:
 
 config: jigs:
 
 let
   hasRust = jigs ? rust;
   hasDocs = jigs ? docs;
+  hasKinora = jigs ? kinora;
 
   rustJig = import ./jigs/rust {
     inherit nixpkgs crane fenix;
   };
 
   docsJig = import ./jigs/docs {
-    inherit nixpkgs mdbook-beans;
+    inherit nixpkgs;
+  };
+
+  kinoraJig = import ./jigs/kinora {
+    inherit nixpkgs crane fenix kinora-src;
   };
 in
 
@@ -61,6 +67,11 @@ flake-utils.lib.eachDefaultSystem (system:
       jigConfig = jigs.docs;
     } else null;
 
+    kinoraResult = if hasKinora then kinoraJig {
+      inherit system;
+      jigConfig = jigs.kinora;
+    } else null;
+
     # Merge packages from all jigs
     packages =
       (if rustResult != null then rustResult.packages else {})
@@ -76,6 +87,7 @@ flake-utils.lib.eachDefaultSystem (system:
       [ pkgs.mise ]
       ++ (if rustResult != null then rustResult.devPackages else [])
       ++ (if docsResult != null then docsResult.devPackages else [])
+      ++ (if kinoraResult != null then kinoraResult.devPackages else [])
       ++ (extraDevPackages pkgs)
     ;
 

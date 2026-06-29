@@ -9,19 +9,19 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    mdbook-beans = {
-      url = "github:edger-dev/mdbook-beans/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-      inputs.crane.follows = "crane";
-      inputs.fenix.follows = "fenix";
+    # kinora CLI source, built from pinned source via crane by the kinora jig.
+    # `flake = false` keeps this acyclic: jig never evaluates kinora's flake
+    # (which itself depends on jig) — it only consumes the source tree.
+    kinora-src = {
+      url = "github:edger-dev/kinora";
+      flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, crane, fenix, mdbook-beans }: {
+  outputs = { self, nixpkgs, flake-utils, crane, fenix, kinora-src }: {
     lib = {
       mkWorkspace = import ./mk-workspace.nix {
-        inherit nixpkgs flake-utils crane fenix mdbook-beans;
+        inherit nixpkgs flake-utils crane fenix kinora-src;
         jigSrc = self;
       };
 
