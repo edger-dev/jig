@@ -1,19 +1,17 @@
-# Docs jig — mdbook + optional mdbook-beans
+# Docs jig — mdbook
 #
 # Returns: { devPackages }
+#
+# Note: kinora needs no mdbook preprocessor — `kinora render` builds its own
+# mdbook from the ledger. Enable the `kinora` jig to get the `kinora` CLI.
 
-{ nixpkgs, mdbook-beans }:
+{ nixpkgs }:
 
 { system, jigConfig }:
 
 let
   pkgs = nixpkgs.legacyPackages.${system};
-  withBeans = jigConfig.beans or false;
 in
 {
-  devPackages =
-    [ pkgs.mdbook ]
-    ++ pkgs.lib.optionals withBeans [
-      mdbook-beans.packages.${system}.default
-    ];
+  devPackages = [ pkgs.mdbook ];
 }

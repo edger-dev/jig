@@ -1,6 +1,6 @@
 ---
 name: jig
-description: "Initialize and sync dev environment jigs (beans, rust, docs). Use when setting up new projects or updating shared config from the jig repo."
+description: "Initialize and sync dev environment jigs (rust, docs, kinora). Use when setting up new projects or updating shared config from the jig repo."
 user_invocable: true
 ---
 
@@ -12,9 +12,10 @@ CLAUDE.md sections for a specific concern.
 
 ## Available Jigs
 
-- **beans** — Issue tracking with beans (`.beans.yml`, hooks, workflow practices)
 - **rust** — Rust workspace with bacon diagnostics, mise tasks, TDD workflow
-- **docs** — Documentation with mdbook, optional mdbook-beans integration
+- **docs** — Documentation with mdbook, mise tasks
+- **kinora** — Knowledge ledger: engineering intent (specs/tasks/plans) tracked
+  in `.kinora/`, plus the `kinora` CLI on the devShell PATH
 
 ## Commands
 
@@ -31,20 +32,15 @@ Scaffold a jig into the current project. Steps:
 
 **Placeholders** (ask the user if not obvious from context):
 - `{{project_name}}` — human-readable project name
-- `{{project_prefix}}` — short prefix for bean IDs (usually lowercase project name)
 - `{{project_description}}` — one-line project description
+- `{{repo_url}}` — git remote URL (kinora ledger identity; infer from `git remote get-url origin`)
 
 **Options for specific jigs:**
 
-`/jig init beans`:
-- Creates `.beans.yml`, `.beans/.gitignore`, merges hooks into `.claude/settings.json`
-- Appends beans CLAUDE.md section (planning, commits, review, acceptance criteria)
-
 `/jig init rust`:
-- Check if beans jig is already present (look for `.beans.yml`). If not, suggest running `/jig init beans` first.
 - Creates `Cargo.toml` (workspace skeleton: edition 2024, empty `members`, standard lints), `bacon.toml`, `.gitignore`, merges mise tasks
 - Appends rust CLAUDE.md section (bacon workflow, TDD)
-- The nix flake is NOT templated — instead, show the user a sample `flake.nix` using the new `mkWorkspace` API:
+- The nix flake is NOT templated — instead, show the user a sample `flake.nix` using the `mkWorkspace` API:
 
 ```nix
 {
@@ -70,19 +66,26 @@ Scaffold a jig into the current project. Steps:
 - Creates `docs/` directory with `book.toml`, `src/SUMMARY.md`, `src/introduction.md`
 - Merges docs mise tasks (`_docs-serve`, `docs-build`)
 - Appends docs CLAUDE.md section
-- **Beans integration**: If beans jig is active (`.beans.yml` exists), ask whether to enable beans in docs:
-  - If yes: append `book.beans.toml` contents to `book.toml`, copy `src/beans-sidebar.css` into `docs/src/`
-  - If no: use base `book.toml` only, skip `beans-sidebar.css`
-  - Remind the user to set `docs = { beans = true; }` in their flake's jigs when beans is enabled
+- **Kinora docs**: kinora needs no mdbook preprocessor — `kinora render` builds
+  its own mdbook from the ledger. To browse the ledger, enable the `kinora` jig
+  (below) and run `kinora render`.
+
+`/jig init kinora`:
+- Creates `.kinora/config.styx` from the template, replacing `{{repo_url}}` with
+  the git origin URL (the `store`/`staged`/`roots` subdirs are created
+  automatically on the first `kinora store` / `kinora commit`).
+- Appends the kinora CLAUDE.md section (the specs/tasks/plans engineering playbook).
+- Add `kinora = {};` to the flake's jigs (see Nix Flake Guidance) and remind the
+  user to `nix develop` — the `kinora` CLI is then on PATH.
 
 ### `/jig sync [jig-name]`
 
 Update existing jig-managed files from the latest templates. Steps:
 
 1. Detect which jigs are active in the current project:
-   - beans: `.beans.yml` exists
    - rust: `bacon.toml` exists
    - docs: `docs/book.toml` exists
+   - kinora: `.kinora/` exists
 2. For each active jig (or just the specified one):
    - Read the current project files and the jig templates
    - Compare CLAUDE.md sections (between `<!-- jig:name -->` markers) — update if template is newer
@@ -103,17 +106,18 @@ Show which jigs are active in the current project and their status.
 - Never touch content outside jig markers — that's project-specific
 
 ### .claude/settings.json
-- Read `claude-settings-hooks.json` from the jig template
-- Merge hooks into the existing settings.json:
+- If a jig ships a `claude-settings-hooks.json`, merge its hooks into the existing settings.json:
   - For each hook event (SessionStart, PreCompact, etc.): add entries that don't already exist
   - Never remove existing hooks — other jigs or the user may have added them
 - Preserve all other settings.json keys (permissions, enabledPlugins, etc.)
+- (The current jigs ship no hooks — kinora is driven by explicit CLI commands.)
 
-### Config files (bacon.toml, .beans.yml, book.toml, .gitignore, mise tasks)
+### Config files (bacon.toml, .kinora/config.styx, book.toml, .gitignore, mise tasks)
 - On init: create if missing, skip if exists (warn the user)
 - On sync: show the diff between current file and template, ask before applying
 - For `.gitignore`: append missing entries rather than overwriting
-- For `book.toml`: base template is `book.toml`; if beans is active, also concatenate `book.beans.toml` and ensure `src/beans-sidebar.css` exists
+- For `.kinora/config.styx`: never clobber a project's declared roots/policies on
+  sync — only surface a diff and let the user decide
 
 ## Nix Flake Guidance
 
@@ -131,13 +135,14 @@ When the user has multiple jigs, show the combined `mkWorkspace` form:
       }
       {
         rust = { buildPackages = [ "my-cli" ]; wasm = true; };
-        docs = { beans = true; };
+        docs = {};
+        kinora = {};   # puts the `kinora` CLI on the devShell PATH
       };
 }
 ```
 
-The nix jigs (`rust`, `docs`) compose automatically — `mkWorkspace` merges
-packages, checks, and devShell from all active jigs.
+The nix jigs (`rust`, `docs`, `kinora`) compose automatically — `mkWorkspace`
+merges packages, checks, and devShell from all active jigs.
 
 ## Important
 
