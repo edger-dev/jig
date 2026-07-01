@@ -1,23 +1,38 @@
 #!/usr/bin/env bash
 # install-rules.sh — store the jig rust lint rules into a project's kinora ledger.
 #
-#   install-rules.sh <target-project-dir>
+#   install-rules.sh [--update] <target-project-dir>
 #
 # Reads the rule sources + manifest.toml beside this script (in the jig repo)
 # and stores each rule as a kino in the target project's `rules` root. Run by
 # `/jig init rust` / `/jig sync rust` when the kinora jig is active.
 #
-# Idempotent: rules already present are skipped. Does NOT commit — it stages the
-# store events and prints the `kinora commit` / `git` next steps, so the caller
-# decides how to land them (kinora commits roots on `main` only).
+# Idempotent: rules already present are skipped. With --update, a rule whose
+# source body has changed is re-versioned in place (identity preserved, current
+# manifest metadata re-applied); unchanged ones are left alone. --update reads
+# the *committed* rules root to find each kino's identity + head, so run it after
+# committing any pending ledger changes.
+#
+# Does NOT commit — it stages the store events and prints the `kinora commit` /
+# `git` next steps, so the caller decides how to land them (kinora commits roots
+# on `main` only).
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="$SRC/manifest.toml"
 
-TARGET="${1:-}"
+UPDATE=0
+TARGET=""
+for arg in "$@"; do
+  case "$arg" in
+    --update) UPDATE=1 ;;
+    -*) echo "unknown flag: $arg" >&2
+        echo "usage: install-rules.sh [--update] <target-project-dir>" >&2; exit 2 ;;
+    *)  TARGET="$arg" ;;
+  esac
+done
 if [ -z "$TARGET" ]; then
-  echo "usage: install-rules.sh <target-project-dir>" >&2
+  echo "usage: install-rules.sh [--update] <target-project-dir>" >&2
   exit 2
 fi
 
@@ -83,8 +98,32 @@ parse_manifest() {
   ' "$MANIFEST"
 }
 
+# ── look up a rule's identity + current head in the committed rules root ─────
+# Echoes "<id>\t<head>" for <name>, or nothing if absent/uncommitted. Same
+# coupling to kinora's committed root styxl as gen-rung0-digest.sh.
+ledger_lookup() {
+  local want="$1" ptr hash blob
+  ptr="$TARGET/.kinora/roots/rules"
+  [ -f "$ptr" ] || return 0
+  hash="$(cat "$ptr")"
+  blob="$TARGET/.kinora/store/${hash:0:2}/${hash}.styxl"
+  [ -f "$blob" ] || return 0
+  awk -v want="$want" '
+    /^\{kind root/ { next }
+    {
+      if (!match($0, /metadata \{name [^,}]+/)) next
+      nm = substr($0, RSTART + 15, RLENGTH - 15); sub(/[[:space:]]+$/, "", nm)
+      if (nm != want) next
+      id = ver = ""
+      if (match($0, /^\{id [0-9a-f]+/))    id  = substr($0, 5, RLENGTH - 4)
+      if (match($0, /version [0-9a-f]+/))  ver = substr($0, RSTART + 8, RLENGTH - 8)
+      print id "\t" ver; exit
+    }
+  ' "$blob"
+}
+
 # ── install each rule ────────────────────────────────────────────────────────
-installed=0; skipped=0; unresolved=0; orphan=0
+installed=0; skipped=0; updated=0; unchanged=0; unresolved=0; deferred=0; orphan=0
 declare -A seen_file
 while IFS=$'\t' read -r name file ns rung target mech category; do
   [ -z "$name" ] && continue
@@ -95,8 +134,31 @@ while IFS=$'\t' read -r name file ns rung target mech category; do
     unresolved=$((unresolved + 1)); continue
   fi
   if kinora -C "$TARGET" resolve "$name" >/dev/null 2>&1; then
-    echo "skip  $name (already in ledger)"
-    skipped=$((skipped + 1)); continue
+    if [ "$UPDATE" -ne 1 ]; then
+      echo "skip  $name (already in ledger)"
+      skipped=$((skipped + 1)); continue
+    fi
+    # --update: re-version only if the source body actually changed.
+    cur="$(kinora -C "$TARGET" resolve "$name" 2>/dev/null || true)"
+    if [ "$cur" = "$(cat "$src_md")" ]; then
+      echo "ok    $name (up to date)"
+      unchanged=$((unchanged + 1)); continue
+    fi
+    lk="$(ledger_lookup "$name")"; id="${lk%%$'\t'*}"; head="${lk#*$'\t'}"
+    if [ -z "$id" ] || [ -z "$head" ]; then
+      echo "warn  $name changed but not found in the committed rules root — commit pending ledger changes, then retry --update" >&2
+      deferred=$((deferred + 1)); continue
+    fi
+    # Re-version: NO --root (that would add a duplicate assign → ambiguous
+    # commit); identity via --id, current head via --parents. Metadata is
+    # per-version, so re-apply the manifest's current values.
+    kinora -C "$TARGET" store markdown "$src_md" \
+      --provenance jig --name "$name" --id "$id" --parents "$head" \
+      -m "rule::ns=$ns" -m "rule::rung=$rung" -m "rule::target-rung=$target" \
+      -m "rule::mechanism=$mech" -m "rule::category=$category" \
+      -m "status::active=true" >/dev/null
+    echo "update $name (re-versioned → rung $rung, $mech, $category)"
+    updated=$((updated + 1)); continue
   fi
   kinora -C "$TARGET" store markdown "$src_md" \
     --provenance jig --root rules --name "$name" \
@@ -119,8 +181,8 @@ done
 
 # ── summary + next steps ─────────────────────────────────────────────────────
 echo
-echo "rules: installed $installed, skipped $skipped, unresolved $unresolved, orphan $orphan"
-if [ "$installed" -gt 0 ]; then
+echo "rules: installed $installed, updated $updated, unchanged $unchanged, skipped $skipped, deferred $deferred, unresolved $unresolved, orphan $orphan"
+if [ "$((installed + updated))" -gt 0 ]; then
   echo "next:"
   echo "  kinora -C \"$TARGET\" commit      # fold roots (run on 'main' only)"
   echo "  git -C \"$TARGET\" add .kinora && git -C \"$TARGET\" commit"

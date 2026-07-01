@@ -6,12 +6,13 @@
 # manifest and, for each entry, stores the source into the target's `rules` root
 # with the metadata below, skipping rules already present:
 #
-#   ./install-rules.sh <project-dir>
+#   ./install-rules.sh [--update] <project-dir>
 #
-# It stages the kinos and prints the `kinora commit` (main) + `git` steps. `/jig
-# init rust` and `/jig sync rust` invoke it when the kinora jig is active. To add
-# a rule: drop a `<slug>.md` here and add its entry below (the installer
-# drift-checks that the two stay in sync).
+# It stages the kinos and prints the `kinora commit` (main) + `git` steps. With
+# `--update` it also re-versions rules whose source body changed (identity
+# preserved). `/jig init rust` and `/jig sync rust` invoke it when the kinora jig
+# is active. To add a rule: drop a `<slug>.md` here and add its entry below (the
+# installer drift-checks that the two stay in sync).
 
 [[rule]]
 name = "jig::rust::no-unwrap-in-lib"

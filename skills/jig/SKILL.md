@@ -129,9 +129,11 @@ Update existing jig-managed files from the latest templates. Steps:
    - Merge `.claude/settings.json` hooks (add missing, don't remove existing)
    - **rust + kinora active:** re-run `templates/rust/rules/install-rules.sh
      <project-dir>` to install any rules added since last sync — it is idempotent
-     (skips ones already in the ledger), so it only adds the new ones. Then run
-     the printed `kinora commit` / `git` steps, and regenerate the rung-0 digest
-     with `templates/rust/rules/gen-rung0-digest.sh <project-dir>`.
+     (skips ones already in the ledger), so it only adds the new ones. Pass
+     `--update` to also re-version rules whose source text changed upstream
+     (unchanged ones are left alone; run it against committed ledger state). Then
+     run the printed `kinora commit` / `git` steps, and regenerate the rung-0
+     digest with `templates/rust/rules/gen-rung0-digest.sh <project-dir>`.
 3. Report what was updated
 
 ### `/jig list`
