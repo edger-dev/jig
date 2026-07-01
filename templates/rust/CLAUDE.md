@@ -50,7 +50,9 @@ on a **graduation ladder**, and the point of the ladder is that most rules cost
 you *zero* context:
 
 - **rung 0 · prose** — a rule no mechanism yet catches. These are the only rules
-  you must actively keep in mind. Query them: rules with `rule::rung=0`.
+  you must actively keep in mind — read `.kinora/rung0-hints.md`, the generated
+  digest of exactly the rung-0 set (regenerate with `gen-rung0-digest.sh` after
+  rules change; it shrinks as rules graduate).
 - **rung 1 · warn** — enforced by clippy config or an architectural test. You do
   **not** memorize these. A violation shows up *after* you write it:
   - clippy rules → in `.bacon-claude-diagnostics` (already part of your loop).

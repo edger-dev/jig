@@ -87,6 +87,17 @@ independently:
   if it isn't, tell the user the enforcement is in place but the rule ledger
   needs `/jig init kinora` first.
 
+  After the rules are committed, regenerate the agent-facing rung-0 digest:
+
+  ```
+  ~/edger/jig/templates/rust/rules/gen-rung0-digest.sh <project-dir>
+  ```
+
+  It writes `.kinora/rung0-hints.md` — the rung-0 rules the agent must hold in
+  context (rung-1+ rules are toolchain-enforced and excluded). It reads the
+  *committed* ledger, so run it after `kinora commit`; commit the regenerated
+  digest too. It shrinks as rules graduate.
+
 `/jig init docs`:
 - Creates `docs/` directory with `book.toml`, `src/SUMMARY.md`, `src/introduction.md`
 - Merges docs mise tasks (`_docs-serve`, `docs-build`)
@@ -119,7 +130,8 @@ Update existing jig-managed files from the latest templates. Steps:
    - **rust + kinora active:** re-run `templates/rust/rules/install-rules.sh
      <project-dir>` to install any rules added since last sync — it is idempotent
      (skips ones already in the ledger), so it only adds the new ones. Then run
-     the printed `kinora commit` / `git` steps.
+     the printed `kinora commit` / `git` steps, and regenerate the rung-0 digest
+     with `templates/rust/rules/gen-rung0-digest.sh <project-dir>`.
 3. Report what was updated
 
 ### `/jig list`
