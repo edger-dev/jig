@@ -1,0 +1,3 @@
+{"@schema":"kinora-commit-archive-v1"}
+{"event_kind":"store","kind":"markdown","id":"4ab0c3b769e0770a8a086bf23641aa7ee2b53f21513e9ab94ba3da740cbbc66a","hash":"4ab0c3b769e0770a8a086bf23641aa7ee2b53f21513e9ab94ba3da740cbbc66a","parents":[],"ts":"2026-07-01T15:30:35.061228946Z","author":"YJ Park","provenance":"authored","metadata":{"name":"jig::task::dylint-scaffold","status::deferred":"true","status::resolved":"false"}}
+{"event_kind":"assign","kind":"kin::assign","id":"4ab0c3b769e0770a8a086bf23641aa7ee2b53f21513e9ab94ba3da740cbbc66a","hash":"4ab0c3b769e0770a8a086bf23641aa7ee2b53f21513e9ab94ba3da740cbbc66a","parents":[],"ts":"2026-07-01T15:30:35.061228946Z","author":"YJ Park","provenance":"authored","metadata":{"kin::target_root":"tasks"}}

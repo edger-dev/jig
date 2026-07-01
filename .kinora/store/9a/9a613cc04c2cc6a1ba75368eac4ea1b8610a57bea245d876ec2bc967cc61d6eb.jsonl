@@ -1,0 +1,3 @@
+{"@schema":"kinora-commit-archive-v1"}
+{"event_kind":"assign","kind":"kin::assign","id":"3dd0da272fad807efbefb9e04767e439e16b7bf314b8dff0f0631095588d85fb","hash":"3dd0da272fad807efbefb9e04767e439e16b7bf314b8dff0f0631095588d85fb","parents":[],"ts":"2026-07-01T15:30:14.380627961Z","author":"YJ Park","provenance":"authored","metadata":{"kin::target_root":"specs"}}
+{"event_kind":"store","kind":"markdown","id":"3dd0da272fad807efbefb9e04767e439e16b7bf314b8dff0f0631095588d85fb","hash":"3dd0da272fad807efbefb9e04767e439e16b7bf314b8dff0f0631095588d85fb","parents":[],"ts":"2026-07-01T15:30:14.380627961Z","author":"YJ Park","provenance":"authored","metadata":{"name":"jig::spec::dylint-mechanism"}}
