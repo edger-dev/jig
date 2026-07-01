@@ -1,0 +1,41 @@
+# Downstream install manifest for the jig rust lint rules.
+#
+# jig ships rule *sources* (the .md files beside this manifest), not pre-baked
+# kino blobs — a kino is content-addressed and must be created by `kinora store`
+# in the consuming project's ledger. An installer walks these entries and runs,
+# for each:
+#
+#   kinora store markdown <file> --provenance jig --root rules --name <name> \
+#     -m rule::ns=<ns> -m rule::rung=<rung> -m rule::target-rung=<target_rung> \
+#     -m rule::mechanism=<mechanism> -m rule::category=<category> \
+#     -m status::active=true
+#
+# then `kinora commit` + `git commit` the ledger. Wiring this into `/jig init`
+# is the next increment; for now it documents the exact projection.
+
+[[rule]]
+name = "jig::rust::no-unwrap-in-lib"
+file = "no-unwrap-in-lib.md"
+ns = "jig::rust"
+rung = 1
+target_rung = 1
+mechanism = "clippy"
+category = "idiom"
+
+[[rule]]
+name = "jig::rust::no-todo-committed"
+file = "no-todo-committed.md"
+ns = "jig::rust"
+rung = 1
+target_rung = 1
+mechanism = "clippy"
+category = "idiom"
+
+[[rule]]
+name = "jig::rust::prefer-file-modules"
+file = "prefer-file-modules.md"
+ns = "jig::rust"
+rung = 1
+target_rung = 1
+mechanism = "arch-test"
+category = "structure"
