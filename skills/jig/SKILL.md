@@ -38,8 +38,10 @@ Scaffold a jig into the current project. Steps:
 **Options for specific jigs:**
 
 `/jig init rust`:
-- Creates `Cargo.toml` (workspace skeleton: edition 2024, empty `members`, standard lints), `bacon.toml`, `.gitignore`, merges mise tasks
-- Appends rust CLAUDE.md section (bacon workflow, TDD)
+- Creates `Cargo.toml` (workspace skeleton: edition 2024, empty `members`, standard lints + the lint-rule clippy config), `clippy.toml` (test carve-outs for the restriction lints), `bacon.toml`, `.gitignore`, merges mise tasks
+- Appends rust CLAUDE.md section (bacon workflow, TDD, the Lint Rules ladder)
+- Points the user at `templates/rust/tests/architecture.rs` — copy it into a crate's `tests/` to enable the structural rule (`jig::rust::prefer-file-modules`)
+- **Installs the lint rules into the kinora ledger** (see below)
 - The nix flake is NOT templated — instead, show the user a sample `flake.nix` using the `mkWorkspace` API:
 
 ```nix
@@ -61,6 +63,29 @@ Scaffold a jig into the current project. Steps:
       };
 }
 ```
+
+**Lint rules (kinora-gated).** The rust jig ships *lint rules* — coding rules the
+toolchain enforces so the agent needn't hold them in context (see the "Lint
+Rules" CLAUDE.md section and `templates/rust/rules/`). Two layers install
+independently:
+
+- **Enforcement** (clippy lints in `Cargo.toml`, `clippy.toml`,
+  `tests/architecture.rs`) ships with the templates above and works with **no
+  kinora** — a fresh rust project gets the guardrails regardless.
+- **The rule ledger** (each rule's statement + rationale + ladder position as a
+  kino) requires the **kinora jig**. Install it by running the shipped script
+  against the project root:
+
+  ```
+  ~/edger/jig/templates/rust/rules/install-rules.sh <project-dir>
+  ```
+
+  It is idempotent (skips rules already present), auto-declares the `rules` root
+  in `.kinora/config.styx` if missing, and **stages** the rule kinos without
+  committing — then prints the `kinora commit` (on `main`) + `git` next steps for
+  you to run. Only run it when `.kinora/` exists (i.e. the kinora jig is active);
+  if it isn't, tell the user the enforcement is in place but the rule ledger
+  needs `/jig init kinora` first.
 
 `/jig init docs`:
 - Creates `docs/` directory with `book.toml`, `src/SUMMARY.md`, `src/introduction.md`
@@ -91,6 +116,10 @@ Update existing jig-managed files from the latest templates. Steps:
    - Compare CLAUDE.md sections (between `<!-- jig:name -->` markers) — update if template is newer
    - Compare config files — show diff and ask before applying changes
    - Merge `.claude/settings.json` hooks (add missing, don't remove existing)
+   - **rust + kinora active:** re-run `templates/rust/rules/install-rules.sh
+     <project-dir>` to install any rules added since last sync — it is idempotent
+     (skips ones already in the ledger), so it only adds the new ones. Then run
+     the printed `kinora commit` / `git` steps.
 3. Report what was updated
 
 ### `/jig list`

@@ -2,16 +2,16 @@
 #
 # jig ships rule *sources* (the .md files beside this manifest), not pre-baked
 # kino blobs — a kino is content-addressed and must be created by `kinora store`
-# in the consuming project's ledger. An installer walks these entries and runs,
-# for each:
+# in the consuming project's ledger. The installer `install-rules.sh` reads this
+# manifest and, for each entry, stores the source into the target's `rules` root
+# with the metadata below, skipping rules already present:
 #
-#   kinora store markdown <file> --provenance jig --root rules --name <name> \
-#     -m rule::ns=<ns> -m rule::rung=<rung> -m rule::target-rung=<target_rung> \
-#     -m rule::mechanism=<mechanism> -m rule::category=<category> \
-#     -m status::active=true
+#   ./install-rules.sh <project-dir>
 #
-# then `kinora commit` + `git commit` the ledger. Wiring this into `/jig init`
-# is the next increment; for now it documents the exact projection.
+# It stages the kinos and prints the `kinora commit` (main) + `git` steps. `/jig
+# init rust` and `/jig sync rust` invoke it when the kinora jig is active. To add
+# a rule: drop a `<slug>.md` here and add its entry below (the installer
+# drift-checks that the two stay in sync).
 
 [[rule]]
 name = "jig::rust::no-unwrap-in-lib"

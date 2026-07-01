@@ -1,0 +1,2 @@
+{"@schema":"kinora-commit-archive-v1"}
+{"event_kind":"store","kind":"markdown","id":"4df64c1bac779eec6ac0806469abf38d31b92092eb4890319a03e96ac87b86ae","hash":"ee5adc20c45bedb068b0d0f0eb9edb4ee0e03f7f505d3603cb0c0c29cebc98c6","parents":["4df64c1bac779eec6ac0806469abf38d31b92092eb4890319a03e96ac87b86ae"],"ts":"2026-07-01T15:01:16.831051982Z","author":"YJ Park","provenance":"authored","metadata":{"name":"jig::spec::rule-delivery"}}
